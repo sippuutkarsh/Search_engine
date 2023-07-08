@@ -37,7 +37,7 @@ const IDF = require("./idf");
 
 // Reading the keywords array
 const keywords = require("./keywords");
-
+console.log(keywords[22574],keywords[5]);
 // Reading the length array
 const length = require("./length");
 
@@ -46,7 +46,7 @@ let TF = require("./TF");
 
 // Reading the titles array
 const titles = require("./titles");
-
+console.log(titles[0]);
 // Reading the urls array
 const urls = require("./urls");
 
@@ -167,15 +167,21 @@ app.get("/search", (req, res) => {
   // Now we need to filter out those keywords which are present in our dataset
   let temp = [];
   for (let i = 0; i < queryKeywords.length; i++) {
-    const id = keywords.indexOf(queryKeywords[i]);
+    let id = keywords.indexOf(queryKeywords[i]);
+    for(let j=0;j<keywords.length;j++){
+      if(keywords[j].trim()==queryKeywords[i]){
+        id=j;
+      }
+    }
     if (id !== -1) {
       temp.push(queryKeywords[i]);
     }
   }
-
+  
   queryKeywords = temp;
   queryKeywords.sort();
-
+  //console.log(1);
+  //console.log(queryKeywords);
   //Getting Unique Query Keyword
   let temp1 = [];
   queryKeywords.forEach((key) => {
@@ -185,13 +191,20 @@ app.get("/search", (req, res) => {
   });
 
   queryKeywords = temp1;
-
+  console.log(2);
+  console.log(queryKeywords);
   //Getting id of every query keyword
   let qid = [];
   queryKeywords.forEach((key) => {
-    qid.push(keywords.indexOf(key));
+    let id = keywords.indexOf(key);
+    for(let j=0;j<keywords.length;j++){
+      if(keywords[j].trim()==key){
+        id=j;
+      }
+    }
+    qid.push(id);
   });
-
+  console.log(qid);
   /**
    * BM25 Algorithm
    */
@@ -222,11 +235,11 @@ app.get("/search", (req, res) => {
     });
 
     // Title Similarity
-    const titSim = stringSimilarity.compareTwoStrings(
-      titles[i],
-      query.toLowerCase()
-    );
-    s *= titSim;
+    // const titSim = stringSimilarity.compareTwoStrings(
+    //   titles[i],
+    //   query.toLowerCase()
+    // );
+    // s *= titSim;
 
     arr.push({ id: i, sim: s });
   }
